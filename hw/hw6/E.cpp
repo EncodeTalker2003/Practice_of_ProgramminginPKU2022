@@ -46,14 +46,32 @@ class warrior{
         friend class headQuarter;
         friend class wolf;
         warrior(headQuarter *h, int Id, int Kind);
-        int getId();
-        int getKind();
-        int getColor();
-        int getLife();
+        int getId() {
+            return warriorId;
+        }
+
+        int getKind() {
+            return warriorKind;
+        }
+
+        int getColor() {
+            return warriorColor;
+        }
+
+        int getLife() {
+            return nowLife;
+        }
+        
         int getAtk() {
             return nowAtk;
         }
-        void reportMove();
+        void reportMove() {
+            cout << nowLife << " elements and force " << nowAtk;
+        }
+
+        void reportName(char endChar) {
+            cout << colorName[warriorColor] << " " << warriorName[warriorKind] << " " << warriorId << endChar;
+        }
         bool canDamage();
         void fight(warrior* oppo);  
         void getDamage(int nowDamage);
@@ -61,10 +79,6 @@ class warrior{
         void setWeaponReady();
         void getRewardWeapon(warrior *p);
         void reportState(int nowHour);
-        void outWeapon() {
-            rep(i, 0, 3) cout << weaponNum[i] << " ";
-            cout << endl;
-        }
 };
 
 class headQuarter{
@@ -95,7 +109,8 @@ warrior::warrior(headQuarter* h, int Id, int Kind): myHeadQuarter(h), warriorId(
     arrow1 = 0;
     rep(i, 0, 3) weaponNum[i] = 0;
     arrow1 = 0;
-    cout << colorName[h->colorId] << " " << warriorName[Kind] << " " << Id << " born" << endl;
+    reportName(' ');
+    cout << "born" << endl;
 }
 
 headQuarter::headQuarter (int col, int m) {
@@ -116,26 +131,6 @@ headQuarter::headQuarter (int col, int m) {
 void headQuarter::reportTotalLife(int nowHour) {
     outTime(nowHour, 50);
     cout << totalLife << " elements in " << colorName[colorId] << " headquarter" << endl;
-}
-
-int warrior::getId() {
-    return warriorId;
-}
-
-int warrior::getKind() {
-    return warriorKind;
-}
-
-int warrior::getColor() {
-    return warriorColor;
-}
-
-int warrior::getLife() {
-    return nowLife;
-}
-
-void warrior::reportMove() {
-    cout << nowLife << " elements and force " << nowAtk;
 }
 
 bool warrior::canDamage() {
@@ -180,10 +175,8 @@ void warrior::fight(warrior* oppo) {
         if (weaponNum[3]) {
             weaponNum[3]--; weaponNum[2]--;
             weaponLength--;
-            //cout << colorName[warriorColor] << " " << warriorName[warriorKind] << " use arrow twice" << endl;
         }
         else {
-            //cout << colorName[warriorColor] << " " << warriorName[warriorKind] << " use arrow first" << endl;
             arrow1++; weaponPtr++;
         }
     }
@@ -208,7 +201,7 @@ void warrior::getRewardWeapon(warrior *p) {
 
 void warrior::reportState(int nowHour) {
     outTime(nowHour, 55);
-    cout << colorName[warriorColor] << " " << warriorName[warriorKind] << " " << warriorId << " ";
+    reportName(' ');
     cout << "has " << weaponNum[0] << " sword " << weaponNum[1] << " bomb " << weaponNum[2] << " arrow and ";
     cout << nowLife << " elements" << endl;
 }
@@ -223,7 +216,8 @@ class dragon: public warrior{
 
         void hooray(int nowHour, int cityNum) {
             outTime(nowHour, 40);
-            cout << colorName[warriorColor] << " dragon " << warriorId << " yelled in city " << cityNum << endl;
+            reportName(' ');
+            cout << "yelled in city " << cityNum << endl;
         }
 };
 
@@ -288,9 +282,9 @@ class wolf: public warrior{
                     weaponNum[i] += tmp; weaponLength += tmp;
                     p->weaponNum[i] -= tmp; p->weaponLength -= tmp;
                     outTime(nowHour, 35);
-                    cout << colorName[warriorColor] << " " << warriorName[warriorKind] << " " << warriorId << " ";
+                    reportName(' ');
                     cout << "took " << tmp << " " << weaponName[i] << " from ";
-                    cout << colorName[p->warriorColor] << " " << warriorName[p->warriorKind] << " " << p->warriorId << " ";
+                    p->reportName(' ');
                     cout << "in city " << nowCity << endl;
                     if (i == 2) {
                         int tmp2 = min(p->weaponNum[3], tmp - p->weaponNum[2]);
@@ -310,7 +304,6 @@ void headQuarter::produceWarrior(int nowHour) {
     if (!canProduce) return;
     nowProduceWarrior++;
     if (nowProduceWarrior > 4) nowProduceWarrior -= 5;
-    //cout << totalLife << endl;
     if (totalLife >= warriorLife[order[nowProduceWarrior]]) {
         totWarrior++;
         totalLife -= warriorLife[order[nowProduceWarrior]];
@@ -325,7 +318,6 @@ void headQuarter::produceWarrior(int nowHour) {
         return;
     }
     if (canProduce) {
-        //cout << this->color << " headquarter stops making warriors" << endl;
         canProduce = 0;
     }
 }
@@ -334,7 +326,8 @@ void lionRunAway(int nowHour) {
     rep(i, 0, n + 1) rep(j, 0, 1) {
         if ((city[i][j] != NULL) && (city[i][j]->getKind() == 3) && (((lion*)city[i][j] )->notLoyal())) {
             outTime(nowHour, 5);
-            cout << colorName[j] << " lion " << city[i][j]->getId() << " ran away" << endl;
+            city[i][j]->reportName(' ');
+            cout << "ran away" << endl;
             city[i][j] = NULL;
         }
     }
@@ -349,7 +342,6 @@ void warriorMove(int nowHour) {
             warrior* tmpWarrior = tmpCity[i - 1][0];
             if (tmpWarrior->getKind() == 2) {
                 ((iceman*)tmpWarrior)->reduceLife();
-                //cout << 'a';
             }
             else if (tmpWarrior->getKind() == 3) {
                 ((lion*)tmpWarrior)->reduceLoyal();
@@ -372,14 +364,14 @@ void warriorMove(int nowHour) {
         if (city[i][0]) {
             outTime(nowHour, 10);
             if ((i > 0) && (i <= n)) {
-                cout << "red " << warriorName[city[i][0]->getKind()] << " " << city[i][0]->getId() << " marched to city " << i;
-                cout << " with ";
+                city[i][0]->reportName(' ');
+                cout << "marched to city " << i << " with ";
 				city[i][0]->reportMove();
 				cout << endl;
             }
             else if (i == n + 1) {
-                cout << "red " << warriorName[city[i][0]->getKind()] << " " << city[i][0]->getId() << " reached blue headquarter"; 
-                cout << " with ";
+                city[i][0]->reportName(' ');
+                cout << "reached blue headquarter with ";
 				city[i][0]->reportMove();
 				cout << endl;
                 outTime(nowHour, 10);
@@ -390,14 +382,14 @@ void warriorMove(int nowHour) {
         if (city[i][1]) {
             outTime(nowHour, 10);
             if ((i > 0) && (i <= n)) {
-                cout << "blue " << warriorName[city[i][1]->getKind()] << " " << city[i][1]->getId() << " marched to city " << i;
-                cout << " with ";
+                city[i][1]->reportName(' ');
+                cout << "marched to city " << i << " with ";
 				city[i][1]->reportMove();
 				cout << endl;
             }
             else if (i == 0) {
-                cout << "blue " << warriorName[city[i][1]->getKind()] << " " << city[i][1]->getId() << " reached red headquarter"; 
-                cout << " with ";
+                city[i][1]->reportName(' ');
+                cout << "reached red headquarter with ";
 				city[i][1]->reportMove();
 				cout << endl;
                 outTime(nowHour, 10);
@@ -421,31 +413,35 @@ void checkDeath(warrior* &a, warrior* &b,int nowHour,int cityNum) {
     outTime(nowHour, 40);
     a->setWeaponReady(); b->setWeaponReady();
     if ((op1) && (op2)) {
-        cout << "both red " << warriorName[a->getKind()] << " " << a->getId() << " and ";
-        cout << "blue " << warriorName[b->getKind()] << " " << b->getId();
-        cout << " died in city " << cityNum << endl;
+        cout << "both ";
+        a->reportName(' ');
+        cout << "and ";
+        b->reportName(' ');
+        cout << "died in city " << cityNum << endl;
         a = NULL; b = NULL;
     }
     else if ((op1) && (!op2)) {
-        cout << "blue " << warriorName[b->getKind()] << " " << b->getId() << " killed ";
-        cout << "red " << warriorName[a->getKind()] << " " << a->getId();
-        cout << " in city " << cityNum;
-        cout << " remaining " << b->getLife() << " elements" << endl;
+        b->reportName(' ');
+        cout << "killed ";
+        a->reportName(' ');
+        cout << "in city " << cityNum << " remaining " << b->getLife() << " elements" << endl;
         b->getRewardWeapon(a); a = NULL;
         if (b->getKind() == 0) ((dragon*)b)->hooray(nowHour, cityNum);
     }
     else if ((!op1) && (op2)) {
-        cout << "red " << warriorName[a->getKind()] << " " << a->getId() << " killed ";
-        cout << "blue " << warriorName[b->getKind()] << " " << b->getId();
-        cout << " in city " << cityNum;
-        cout << " remaining " << a->getLife() << " elements" << endl;
+        a->reportName(' ');
+        cout << "killed ";
+        b->reportName(' ');
+        cout << "in city " << cityNum << " remaining " << a->getLife() << " elements" << endl;
         a->getRewardWeapon(b); b = NULL;
         if (a->getKind() == 0) ((dragon*)a)->hooray(nowHour, cityNum);
     }
     else if ((!op1) && (!op2)) {
-        cout << "both red " << warriorName[a->getKind()] << " " << a->getId() << " and ";
-        cout << "blue " << warriorName[b->getKind()] << " " << b->getId();
-        cout << " were alive in city " << cityNum << endl;
+        cout << "both ";
+        a->reportName(' ');
+        cout << "and ";
+        b->reportName(' ');
+        cout << "were alive in city " << cityNum << endl;
         if (a->getKind() == 0) ((dragon*)a)->hooray(nowHour, cityNum);
         if (b->getKind() == 0) ((dragon*)b)->hooray(nowHour, cityNum);
     }
@@ -456,9 +452,6 @@ void allBattle(int nowHour) {
         if ((city[i][0] != NULL) && (city[i][1] != NULL)) {
             int fir = (i & 1) ^ 1, sec = fir ^ 1, flag = 1;
             city[i][0]->setWeaponReady(); city[i][1]->setWeaponReady();
-            //city[i][0]->outWeapon(); city[i][1]->outWeapon();
-            //cout << city[i][0]->getLife() << " " << city[i][1]->getLife() << endl;
-            //cout << city[i][0]->getAtk() << " " << city[i][1]->getAtk() << endl;
             while (1) {
                 if ((!city[i][0]->canDamage()) && (!city[i][1]->canDamage())) break;
                 city[i][fir]->fight(city[i][sec]);
@@ -475,15 +468,12 @@ void allBattle(int nowHour) {
 void allReportState(int nowHour) {
     rep(i, 0, n + 1) rep(j, 0, 1) {
         if (city[i][j] != NULL) {
-            //cout << "report " << i << " " << j << endl;
             city[i][j]->reportState(nowHour);
         }
     }
 }
                     
 int main() {
-    //freopen("e.in", "r", stdin);
-    //freopen("e.out", "w", stdout);
     ios::sync_with_stdio(false);
     cin.tie(0); cout.tie(0);
     int T;
@@ -528,20 +518,5 @@ int main() {
     return 0;
 }
 
-
-//2022.3.24 12:55 finished incident before and in 35 min
-
-/*
-string warriorName[] = {"dragon", "ninja", "iceman", "lion", "wolf"};
-string weaponName[] = {"sword" , "bomb" , "arrow"};
-string colorName[] = {"red", "blue"};
-*/
-
-/*
-1
-6000 10 10 240
-120 20 130 10 20
-50 50 50 50 150
-*/
 
 
